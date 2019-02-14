@@ -1,0 +1,17 @@
+body {
+    text-align: center;
+    background-color: lightgrey;
+    margin: none;
+    font-family: sans-serif;
+}
+
+#sigInput {
+    visibility: hidden;
+}
+/*SPICED: light purple, yellowy orange, red, rebeccapurple */
+#sigCanvas {
+    margin: 20px;
+    border: 1px black dotted;
+    width: 400px;
+    height: 100px;
+}
