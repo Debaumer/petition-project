@@ -18,4 +18,10 @@ app.get("/getcities", (req, res) => {
         });
 });
 
+app.post("/createnewcity", (req, res) => {
+    db.addCity("Berlin", "Berlin").then(() => {
+        console.log("hello");
+    });
+});
+
 app.listen(8080, () => console.log("RUNNING"));
