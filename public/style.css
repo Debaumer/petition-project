@@ -14,4 +14,22 @@ body {
     border: 1px black dotted;
     width: 400px;
     height: 100px;
+    background-color: white;
+}
+
+#registerForm {
+  padding: 20px;
+  position: relative;
+  border-radius: 20px;
+  background-color: white;
+}
+
+ input {
+  margin-top: 20px;
+  display: block;
+  margin-left: 33%;
+}
+
+#formButton {
+  margin-left: 40%;
 }

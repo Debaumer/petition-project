@@ -1,0 +1,15 @@
+<div id="register">
+  <form method="POST" id="registerForm">
+      <div>
+          <h1>Create an account to Sign the petition!</h2>
+          <input type="text" name="firstName" placeholder="first name" required>
+          <input type="text" name="lastName" placeholder="last name" required>
+          <input type="email" name="email" placeholder="E-mail" required>
+          <input type="password" name="password" placeholder="password" required>
+          <input type="password" name="confirmPassword" placeholder="confirm password" required>
+          <input type="hidden" name="_csrf" value="{{csurfToken}}">
+      </div>
+      <input id="formButton" value="Sign Up and Sign!" type="submit">
+  </form>
+  <h2>Already got an account? <a href="/login">Click here</a></h2>
+</div>

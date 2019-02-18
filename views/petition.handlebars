@@ -1,6 +1,6 @@
 <div>
     <h2>Sign Here</h2>
-    <form>
+    <form method="POST" id="petitionForm">
         <div>
             <input type="text" name="firstName" placeholder="first name">
             <input type="text" name="lastName" placeholder="last name">
@@ -10,9 +10,7 @@
         </div>
         <input type="submit">
     </form>
-    <canvas id="sigCanvas">
-    </canvas>
-    <button>Clear Signature</button>
 </div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
-<script src="canvas.js"></script>
+<canvas id="sigCanvas"></canvas>
+<button id="clearButton">Clear Signature</button>
+<script src="controller.js"></script>
