@@ -1,0 +1,26 @@
+<h2>Change your details</h2>
+<form method="POST">
+  <input type="text" name="firstName" placeholder="first name">
+  <label for="firstName">First Name</label>
+
+  <input type="text" name="lastName" placeholder="last name">
+  <label for="lastName">Last Name</label>
+
+  <input type="email" name="email" placeholder="e-mail">
+  <label for="email">E-mail</label>
+
+  <input type="password" name="password" placeholder="password">
+  <label for="password">Password</label>
+
+  <input type="text" name="age" placeholder="age">
+  <label for="age">Age</label>
+
+  <input type="text" name="city" placeholder="city/town">
+  <label for="city">City or Town</label>
+
+  <input type="text" name="homepage" placeholder="homepage or social media">
+  <label for="homepage">Homepage</label>
+
+  <input type="hidden" name="_csrf" value="{{csrfToken}}">
+  <input  id="formButton" type="submit" name="submit" value="Update">
+</form>

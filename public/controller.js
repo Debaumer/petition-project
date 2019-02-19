@@ -1,7 +1,7 @@
 //vars
 var canvas = document.getElementById('sigCanvas');
 var clearButton = document.getElementById('clearButton');
-var submit = document.getElementById('petitionForm');
+var submit = document.getElementById('submitForm');
 var ctx = canvas.getContext('2d');
 var canvSize = canvas.getBoundingClientRect();
 var prevX = 0;
@@ -26,7 +26,6 @@ height = canvas.height;
 function save() {
   var dataURL = canvas.toDataURL();
   document.getElementById('sigInput').value = dataURL;
-  //console.log(dataURL);
 }
 
 function erase() {

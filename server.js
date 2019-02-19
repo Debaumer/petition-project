@@ -1,30 +1,38 @@
 const express = require("express");
 const bodyParser = require('body-parser');
 const csurf = require('csurf');
-var pg = require("pg");
 const cookieSession = require('cookie-session');
-const spicedPg = require('spiced-pg');
-
+const secret = require('./secret.json');
+//const db = require('./db.js')
 const app = express();
-
 const hb = require("express-handlebars");
+const bcrypt = require("bcryptjs");
+
+//console.log(bcrypt);
+
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
+var title = "Make SPICED hoodies that are slightly lighter grey than the ones that are currently on offer, \n again";
 
-var title = "Make spiced hoodies that are slightly lighter grey than the ones that are currently on offer, \n again"
+//console.log(db.selectAll);
 
 app.use(cookieSession({
-  secret: 'needs a link to a JSON file',
+  secret: `${secret.secret}`,
   maxAge: 1000 * 60 * 60 * 24
 }));
-
-// cookieSession({
-//   name: req.body.name
-// })
 
 app.use(bodyParser.urlencoded({
   extended: false
 }));
+
+app.use(csurf());
+
+app.use(function(req,res,next) {
+  res.locals.csrfToken = req.csrfToken();
+  //console.log(req.csrfToken());
+  console.log('loggerin',res.locals.csrfToken);
+  next();
+})
 
 app.use(express.static(__dirname + "/public"));
 
@@ -64,21 +72,25 @@ app.get("/signatures", (req, res) => {
 //app.use(csurf());
 
 app.get("/", (req, res) => {
+  //console.log(db.selectAll);
     res.render("register", {
         layout: "main",
-        cause:{
+        cause: {
           title: title
         },
+        csrfToken: req.csrfToken,
         navItems: [{ name: "see who else has signed already", link: "/signatures" }]
     });
 });
 
 app.post("/", (req, res) => {
-  console.log('helllo');
-  console.log(req.body);
-  console.log(req.session); //this is what is used with csurf
-  console.log(cookieSession);
-  res.redirect("/profile")
+  //console.log('hello');
+  console.log(req.csrfToken);
+  console.log(req.body.signInput);
+  //spicedPg.createUser(req.body.firstName,req.body.lastName,req.body.email,req.body.password,req.body.signInput)
+  // console.log(req.body);
+  // console.log(req.session); //this is what is used with csurf
+  res.redirect("/profile");
 });
 
 app.get("/profile", (req,res) => {
@@ -86,8 +98,26 @@ app.get("/profile", (req,res) => {
     layout: "main",
     cause: {
       title: title
-    }
-  })
-})
+    },
+    csrfToken: req.csrfToken
+  });
+});
+
+app.get("/profile/edit", (req,res) => {
+  res.render('edit', {
+    navItems: [
+      {name: 'See your fellow supporters',
+      link: "/signatures"}
+    ],
+    layout: "main",
+    cause: '',
+    csrfToken: req.csrfToken
+  });
+});
+
+app.post("/profile", (req,res) => {
+  console.log(res.body);
+  res
+});
 
 app.listen(8080, () => console.log("online"));

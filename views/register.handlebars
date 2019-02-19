@@ -7,9 +7,13 @@
           <input type="email" name="email" placeholder="E-mail" required>
           <input type="password" name="password" placeholder="password" required>
           <input type="password" name="confirmPassword" placeholder="confirm password" required>
-          <input type="hidden" name="_csrf" value="{{csurfToken}}">
+          <input type="hidden" name="passwordFinalCheck">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
       </div>
-      <input id="formButton" value="Sign Up and Sign!" type="submit">
+      <input id="submitForm" value="Sign Up and Sign!" type="submit">
   </form>
+  <canvas id="sigCanvas"></canvas>
+  <button id="clearButton">Clear Signature</button>
+  <script src="controller.js"></script>
   <h2>Already got an account? <a href="/login">Click here</a></h2>
 </div>
