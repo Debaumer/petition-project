@@ -9,7 +9,6 @@ var prevY = 0;
 var currX = 0;
 var currY = 0;
 var flag = false;
-
 function init () {
   var prevX = 0;
   var prevY = 0;
@@ -22,12 +21,16 @@ function init () {
 width = canvas.width;
 height = canvas.height;
 
+console.log(document.getElementById('sigInput').value);
 //functions
 function save() {
   var dataURL = canvas.toDataURL();
+  console.log(dataURL);
   document.getElementById('sigInput').value = dataURL;
+  console.log(document.getElementById('sigInput').value);
 }
 
+save();
 function erase() {
   ctx.clearRect(0,0,width, height);
 }
@@ -63,18 +66,19 @@ function trackMouse(e) {
   draw();
 }
 //events
+console.log(submit.value);
+console.log(document.g);
 submit.addEventListener('submit', function(e) {
+  console.log(e.target.value);
+  e.preventDefault();
   save();
-  //console.log(e);
-  //console.log(e.target);
-});
+},false);
 
 clearButton.addEventListener('click', function(e) {
   erase();
 });
 
 canvas.addEventListener('mousedown', function(e) {
-  //console.log(e.type);
   setFlag(e.type)
 },false);
 
