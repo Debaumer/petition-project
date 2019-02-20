@@ -1,5 +1,6 @@
 <div>
     <h2>Sign Here</h2>
+<<<<<<< HEAD
     <form>
         <div>
             <input type="text" name="first name" placeholder="first name">
@@ -14,3 +15,16 @@
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"> </script>
 <script src="canvas.js"></script>
+=======
+    <form method="POST" id="petitionForm">
+        <div>
+            <input type="text" name="firstName" placeholder="first name">
+            <input type="text" name="lastName" placeholder="last name">
+            <input type="email" name="email" placeholder="E-mail">
+            <input id="sigInput" name="signature" placeholder="signature">
+            <input type="hidden" name="_csrf" value="{{csrfToken}}">
+        </div>
+        <input type="formSubmit" value>
+    </form>
+</div>
+>>>>>>> bb03adac58627f2e3b20288079e7d4363649612e
