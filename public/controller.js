@@ -19,8 +19,8 @@ function init() {
 }
 console.log(submit);
 
-width = canvas.width;
-height = canvas.height;
+var width = canvSize.width;
+var height = canvSize.height;
 
 //functions
 function save() {
@@ -63,8 +63,7 @@ function trackMouse(e) {
 //events
 submit.addEventListener(
     "submit",
-    function(e) {
-        console.log(e);
+    function() {
         save();
     },
     false
