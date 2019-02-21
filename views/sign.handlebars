@@ -1,3 +1,9 @@
-<p>Tell the world why you are signing this petition</p>
-<textarea name="reason">
-</textarea>
+<h1>Sign here and let the world know that <em>{{cause}}</em><br><br>matters to you!</h1>
+<canvas id="sigCanvas"></canvas>
+<button id="clearButton">Clear Signature</button>
+<form id="signatureForm" method="POST">
+    <input id="sigInput" name="sigInput" type="hidden">
+    <input type="hidden" name="_csrf" value="{{csrfToken}}">
+    <input id="submitButton" type="submit" value="SIGN THE PETITION">
+</form>
+<script src="controller.js"></script>

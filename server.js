@@ -2,54 +2,17 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const csurf = require("csurf");
 const cookieSession = require("cookie-session");
-const secret = require("./secret.json");
 
 const db = require("./db.js");
+const secret = require("./secret.json");
+const bcrypt = require("./bcrypt");
 
 const app = express();
+
 const hb = require("express-handlebars");
-
-const bcrypt = require("bcryptjs");
-
-function hashPassword(plainTextPassword) {
-    return new Promise(function(resolve, reject) {
-        bcrypt.genSalt(function(err, salt) {
-            if (err) {
-                return reject(err);
-            }
-            bcrypt.hash(plainTextPassword, salt, function(err, hash) {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(hash);
-            });
-        });
-    });
-}
-
-function confirmPassword(initial, confirmation) {
-    //todo
-    return new Promise();
-}
-
-function checkPassword(textEnteredInLoginForm, hashedPasswordFromDatabase) {
-    return new Promise(function(resolve, reject) {
-        bcrypt.compare(
-            textEnteredInLoginForm,
-            hashedPasswordFromDatabase,
-            function(err, doesMatch) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(doesMatch);
-                }
-            }
-        );
-    });
-}
-
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
+
 var title =
     "Make SPICED hoodies that are slightly lighter grey than the ones that are currently on offer, \n again";
 
@@ -69,6 +32,7 @@ app.use(
 app.use(csurf());
 
 app.use(function(req, res, next) {
+    res.setHeader("X-Frame-Options", "DENY");
     res.locals.csrfToken = req.csrfToken();
     next();
 });
@@ -76,26 +40,13 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + "/public"));
 
 app.get("/thankyou", (req, res) => {
-    var results = db
-        .selectAll()
-        .then(result => {
-            console.log(results);
-            return results;
-        })
-        .catch(err => {
-            console.log(err);
+    db.getSignerCount().then(n => {
+        //should be all signatures with a limit on it
+        //console.log(n);
+        res.render("thankyou", {
+            layout: "main",
+            amount: n.rowCount
         });
-    console.log(results);
-    res.render("thankyou", {
-        layout: "main",
-        cause: {
-            title: title
-        },
-        amount: results,
-        navItems: [
-            { name: "petition page", link: "/" },
-            { name: "see who else has signed", link: "/signatures" }
-        ]
     });
 });
 
@@ -106,36 +57,30 @@ app.get("/login", (req, res) => {
     });
 });
 
-app.get("test", (req, res) => {
-    hashPassword(req.body.password);
-    db.getHash("fuckas");
-});
-
 app.post("/login", (req, res) => {
-    var pword = hashPassword(req.body.password);
-    db.getHash("ass")
-        .then(result => {
-            console.log("result", result);
+    req.body.password = bcrypt
+        .hashPw(req.body.password)
+        .then(pw => {
+            console.log("pw:" + pw);
         })
-        .catch(error => {
-            console.log("error", error);
+        .catch(err => {
+            console.log("ERROR:" + err);
+        });
+    console.log(req.body.password);
+    db.login(req.body.email, req.body.password)
+        .then(data => {
+            console.log(data);
+        })
+        .catch(err => {
+            console.log("ERROR", err);
+            res.render("login", {
+                layout: "main",
+                error: err
+            });
         });
 });
 
-app.get("/signatures", (req, res) => {
-    res.render("signatures", {
-        layout: "main",
-        navItems: [
-            {
-                name:
-                    "sign up again with a different email to inflate our numbers!",
-                link: "/"
-            }
-        ]
-    });
-});
-
-//app.use(csurf());
+app.get("/signatures", (req, res) => {});
 
 app.get("/", (req, res) => {
     res.render("register", {
@@ -152,37 +97,32 @@ app.get("/", (req, res) => {
 
 app.post("/", (req, res) => {
     //console.log('hello');
-    const password = hashPassword(req.body.password);
-    db.selectAll()
-        .then(result => {
-            console.log(result);
+    req.body.password = bcrypt
+        .hashPw(req.body.password)
+        .then(pw => {
+            console.log("pw:" + pw);
         })
-        .catch(error => {
-            console.log(error);
+        .catch(err => {
+            console.log("ERROR:" + err);
         });
     db.createUser(
         req.body.firstName,
         req.body.lastName,
         req.body.email,
-        password,
-        req.body.signature
+        req.body.password
     )
         .then(values => {
+            res.redirect("/profile");
             console.log("values", values);
         })
-        .catch(error => {
-            res.redirect("/");
-            console.log("ahhhh");
-            console.log(error.msg);
+        .catch(err => {
+            console.log(err.detail);
+            res.render("register", {
+                layout: "main",
+                error: err,
+                msg: err
+            });
         });
-    //spicedPg.createUser(req.body.firstName,req.body.lastName,req.body.email,req.body.password,req.body.signInput)
-    // console.log(req.body);
-    // console.log(req.session); //this is what is used with csurf
-    if (res.err) {
-        console.log("ahh no its fucked");
-        res.redirect("/");
-    }
-    res.redirect("/profile");
 });
 
 app.get("/edit", (req, res) => {
@@ -205,7 +145,18 @@ app.get("/profile", (req, res) => {
     });
 });
 
-app.post("/profile", (req, res) => {
+app.post("/profile", (req, res) => {});
+
+app.get("/sign", (req, res) => {
+    res.render("sign", {
+        layout: "main",
+        cause: title,
+        csrfToken: req.csrfToken
+    });
+});
+
+app.post("/sign", (req, res) => {
+    console.log(req.body);
     res.redirect("/thankyou");
 });
 
