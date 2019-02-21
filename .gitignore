@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 node_modules
 .DS_Store
 package-lock.json
+
 /demo
-=======
-node_modules
-.DS_Store
-package-lock.json
-/demo
-secret.env.json
->>>>>>> bb03adac58627f2e3b20288079e7d4363649612e
+
+views/partials/cause*
+views/partials/modal*
+/views/maker

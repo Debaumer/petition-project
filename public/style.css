@@ -1,20 +1,12 @@
 body {
     text-align: center;
-<<<<<<< HEAD
-    background-image: linear-gradient(#11111111, #101010);
-=======
     background-color: lightgrey;
->>>>>>> bb03adac58627f2e3b20288079e7d4363649612e
     margin: none;
     font-family: sans-serif;
 }
 
 #sigInput {
-<<<<<<< HEAD
     visibility: hidden;
-=======
-  visibility: hidden;
->>>>>>> bb03adac58627f2e3b20288079e7d4363649612e
 }
 /*SPICED: light purple, yellowy orange, red, rebeccapurple */
 #sigCanvas {
@@ -22,25 +14,22 @@ body {
     border: 1px black dotted;
     width: 400px;
     height: 100px;
-<<<<<<< HEAD
-=======
     background-color: white;
 }
 
 #registerForm {
-  padding: 20px;
-  position: relative;
-  border-radius: 20px;
-  background-color: white;
+    padding: 20px;
+    position: relative;
+    border-radius: 20px;
+    background-color: white;
 }
 
- input {
-  margin-top: 20px;
-  display: block;
-  margin-left: 33%;
+input {
+    margin-top: 20px;
+    display: block;
+    margin-left: 33%;
 }
 
 #formButton {
-  margin-left: 40%;
->>>>>>> bb03adac58627f2e3b20288079e7d4363649612e
+    margin-left: 40%;
 }

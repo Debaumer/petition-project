@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="/create/style.css" type="text/css" rel="stylesheet">
+    <title>Petition-Hub</title>
+</head>
+    <body>
+        {{>nav}}
+        {{#if error}}
+            <h4 style="color: red">Something went wrong, please check your actions and try again<h4>
+        {{/if}}
+        {{{body}}}
+    </body>
+</html>

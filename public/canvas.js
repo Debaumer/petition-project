@@ -1,43 +1,7 @@
-<<<<<<< HEAD
-let canvas = $("#sigCanvas")[0];
-console.log(canvas);
-let ctx = canvas.getContext("2d");
-console.log(ctx);
-
-function drawline(prevX, prevY, currX, currY) {
-    ctx.beginPath();
-    ctx.moveTo(prevX, prevY);
-    ctx.moveTo(currX, currY);
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 14;
-    ctx.stroke();
-    ctx.closePath();
-}
-
-function clearSig(m) {
-    if (m) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-}
-
-canvas.addEventListener("mousedown", function(e) {
-    console.log("x:", e.pageX, "y:", e.pageY); //subtract offsets to get box x and y
-    canvas.addEventListener("mousemove", function(ev) {
-        console.log("x:" + ev.pageX, "y:" + ev.pageY);
-    });
-    drawline();
-});
-
-canvas.addEventListener("mouseup", function(e) {
-    canvas.removeEventListener("mousedown", canvas);
-    canvas.removeEventListener("mousemove", canvas);
-});
-
-function saveSig() {
-    var dataURL = canvas.toDataURL();
-}
-=======
-var canvas, ctx, flag, clearButton = false,
+var canvas,
+    ctx,
+    flag,
+    clearButton = false,
     prevX = 0,
     currX = 0,
     prevY = 0,
@@ -88,7 +52,7 @@ var submit = false;
 //         //console.log(e);
 //     }, false);
 // }
-canvas = document.getElementById('sigCanvas');
+canvas = document.getElementById("sigCanvas");
 ctx = canvas.getContext("2d");
 submit = document.getElementById("petitionForm");
 clearButton = document.getElementById("clearButton");
@@ -99,58 +63,72 @@ w = canvas.width;
 h = canvas.height;
 // console.log(w);
 // console.log(h);
-submit.addEventListener('submit', function(e) {
-  //e.preventDefault();
-  save();
-  console.log(e.target);
-  console.log(e.target[3].value);
-  console.log(e.target[2].value);
+submit.addEventListener("submit", function(e) {
+    //e.preventDefault();
+    save();
+    console.log(e.target);
+    console.log(e.target[3].value);
+    console.log(e.target[2].value);
 });
 
-clearButton.addEventListener('click', function(e) {
-  erase();
+clearButton.addEventListener("click", function(e) {
+    erase();
 });
 
-canvas.addEventListener("mousemove", function (e) {
-    findxy('move', e)
-}, false);
-canvas.addEventListener("mousedown", function (e) {
-    findxy('down', e)
-}, false);
-canvas.addEventListener("mouseup", function (e) {
-    findxy('up', e)
-}, false);
-canvas.addEventListener("mouseout", function (e) {
-    findxy('out', e)
-}, false);
-
-
+canvas.addEventListener(
+    "mousemove",
+    function(e) {
+        findxy("move", e);
+    },
+    false
+);
+canvas.addEventListener(
+    "mousedown",
+    function(e) {
+        findxy("down", e);
+    },
+    false
+);
+canvas.addEventListener(
+    "mouseup",
+    function(e) {
+        findxy("up", e);
+    },
+    false
+);
+canvas.addEventListener(
+    "mouseout",
+    function(e) {
+        findxy("out", e);
+    },
+    false
+);
 
 function draw() {
-  console.log('draw run');
+    console.log("draw run");
     ctx.beginPath();
-    ctx.strokeStyle = 'black';
+    ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctx.moveTo(prevX, prevY);
     ctx.lineTo(currX, currY);
-    ctx.strokeStyle = 'black';
+    ctx.strokeStyle = "black";
     ctx.lineWidth = 2;
     ctx.stroke();
 }
 
 function test() {
-  ctx.strokeStyle = 'black';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.beginPath();
-  ctx.moveTo(0,0);
-  ctx.lineTo(50,50);
-  ctx.stroke();
-  ctx.closePath();
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(50, 50);
+    ctx.stroke();
+    ctx.closePath();
 }
 
 function erase() {
-  ctx.clearRect(0, 0, w, h);
+    ctx.clearRect(0, 0, w, h);
 }
 
 function save() {
@@ -159,8 +137,8 @@ function save() {
 }
 
 function findxy(res, e) {
-  console.log(res);
-    if (res == 'down') {
+    console.log(res);
+    if (res == "down") {
         prevX = currX;
         prevY = currY;
         currX = e.clientX - canvas.offsetLeft;
@@ -170,16 +148,16 @@ function findxy(res, e) {
         dot_flag = true;
         if (dot_flag) {
             ctx.beginPath();
-            ctx.fillStyle = 'black';
+            ctx.fillStyle = "black";
             ctx.fillRect(currX, currY, 2, 2);
             ctx.closePath();
             dot_flag = false;
         }
     }
-    if (res == 'up' || res == "out") {
+    if (res == "up" || res == "out") {
         flag = false;
     }
-    if (res == 'move') {
+    if (res == "move") {
         if (flag) {
             prevX = currX;
             prevY = currY;
@@ -191,4 +169,3 @@ function findxy(res, e) {
 }
 test();
 draw();
->>>>>>> bb03adac58627f2e3b20288079e7d4363649612e

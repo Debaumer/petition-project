@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS users_profiles;
 
-CREATE TABLE user_profiles (
+CREATE TABLE users (
   id SERIAL primary key,
   firstName VARCHAR(255) not null,
   lastName VARCHAR(255) not null,
@@ -11,6 +11,7 @@ CREATE TABLE user_profiles (
   city VARCHAR(255),
   homepage VARCHAR(255)
 );
+
 
 DROP TABLE IF EXISTS causes;
 
