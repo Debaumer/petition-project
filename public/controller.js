@@ -4,32 +4,33 @@ var clearButton = document.getElementById("clearButton");
 var submit = document.getElementById("submitForm");
 var ctx = canvas.getContext("2d");
 var canvSize = canvas.getBoundingClientRect();
-var registerForm = document.getElementById("registerForm");
 var prevX = 0;
 var prevY = 0;
 var currX = 0;
 var currY = 0;
 var flag = false;
-
 function init() {
-    prevX = 0;
-    prevY = 0;
-    currX = 0;
-    currY = 0;
-    flag = false;
-    canvSize = canvas.getBoundingClientRect();
+    var prevX = 0;
+    var prevY = 0;
+    var currX = 0;
+    var currY = 0;
+    var flag = false;
+    var canvSize = canvas.getBoundingClientRect();
 }
 
-var width = canvas.width;
-var height = canvas.height;
+width = canvas.width;
+height = canvas.height;
 
+console.log(document.getElementById("sigInput").value);
 //functions
 function save() {
     var dataURL = canvas.toDataURL();
+    console.log(dataURL);
     document.getElementById("sigInput").value = dataURL;
     console.log(document.getElementById("sigInput").value);
 }
 
+save();
 function erase() {
     ctx.clearRect(0, 0, width, height);
 }
@@ -65,18 +66,25 @@ function trackMouse(e) {
     draw();
 }
 //events
-registerForm.addEventListener("submit", function() {
-    save();
-});
+console.log(submit.value);
+console.log(document.g);
+submit.addEventListener(
+    "submit",
+    function(e) {
+        console.log(e.target.value);
+        e.preventDefault();
+        save();
+    },
+    false
+);
 
-clearButton.addEventListener("click", function() {
+clearButton.addEventListener("click", function(e) {
     erase();
 });
 
 canvas.addEventListener(
     "mousedown",
     function(e) {
-        //console.log(e.type);
         setFlag(e.type);
     },
     false
@@ -103,7 +111,7 @@ canvas.addEventListener("mouseout", function(e) {
     setFlag(e.type);
 });
 
-window.onresize = function(event) {
+window.onresize = function(ev) {
     //add init code here
     //need to re-init prevpos and currpos
     init();

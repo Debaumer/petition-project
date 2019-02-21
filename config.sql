@@ -1,22 +1,19 @@
-DROP TABLE IF EXISTS users_profiles;
+DROP TABLE IF EXISTS users;
 
 CREATE TABLE users (
   id SERIAL primary key,
   firstName VARCHAR(255) not null,
   lastName VARCHAR(255) not null,
-  UNIQUE email VARCHAR(255) not null,
+  email VARCHAR(255) UNIQUE not null,
   password VARCHAR(255) not null,
-  signature VARCHAR(255) not null,
-  age int,
-  city VARCHAR(255),
-  homepage VARCHAR(255)
+  signature VARCHAR(500) not null
 );
 
+DROP TABLE IF EXISTS user_profiles;
 
-DROP TABLE IF EXISTS causes;
-
-CREATE TABLE causes (
-  id SERIAL primary key,
-  UNIQUE cause VARCHAR(255) not null,
-  signatories int
+CREATE TABLE user_profiles (
+  email VARCHAR(255) UNIQUE,
+  age int,
+  city VARCHAR(20),
+  homepage VARCHAR(100)
 );
