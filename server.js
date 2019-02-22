@@ -114,9 +114,7 @@ app.get("/signatures", (req, res) => {
 app.get("/", (req, res) => {
     res.render("register", {
         layout: "main",
-        cause: {
-            title: title
-        },
+        cause: title,
         csrfToken: req.csrfToken,
         navItems: [
             { name: "see who else has signed already", link: "/signatures" }

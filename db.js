@@ -79,11 +79,11 @@ module.exports.updateProfile = function updateProfile(
 
     if (password) {
         console.log("changed pw");
-        return db.query(q1, param1);
+        return db.query(qs1, param1);
     } else {
         console.log("didn't change pw");
-        console.log(q2, param2);
-        return db.query(q2, param2);
+        console.log(qs2, param2);
+        return db.query(qs2, param2);
     }
 };
 
