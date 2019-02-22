@@ -1,6 +1,9 @@
 var spicedPg = require("spiced-pg");
 var secret = require("./secret.json");
-var db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
+var db = spicedPg(
+    process.env.DATABASE_URL ||
+        "postgres:postgres:postgres@localhost:5432/petition"
+);
 
 exports.getAllSignatures = function() {
     const qs =
