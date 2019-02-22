@@ -4,7 +4,6 @@ const csurf = require("csurf");
 const cookieSession = require("cookie-session");
 
 const db = require("./db.js");
-const secret = require("./secret.json");
 const bcrypt = require("./bcrypt");
 
 const app = express();
@@ -18,7 +17,7 @@ var title =
 
 app.use(
     cookieSession({
-        secret: `${secret.secret}`,
+        secret: "you will have to speak up I'm wearing a towel",
         maxAge: 1000 * 60 * 60 //* 24 * 7 * 2
     })
 );
