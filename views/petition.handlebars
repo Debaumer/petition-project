@@ -2,10 +2,10 @@
     <h2>Sign Here</h2>
     <form method="POST" id="petitionForm">
         <div>
-            <input type="text" name="firstName" placeholder="first name">
-            <input type="text" name="lastName" placeholder="last name">
-            <input type="email" name="email" placeholder="E-mail">
-            <input id="sigInput" name="signature" placeholder="signature">
+            <input type="text" name="firstName" placeholder="first name" required>
+            <input type="text" name="lastName" placeholder="last name" required>
+            <input type="email" name="email" placeholder="E-mail" required>
+            <input id="sigInput" name="signature" placeholder="signature" required>
             <input type="hidden" name="_csrf" value="{{csrfToken}}">
         </div>
         <input type="formSubmit" value>

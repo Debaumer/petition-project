@@ -39,15 +39,31 @@ app.use(function(req, res, next) {
 
 app.use(express.static(__dirname + "/public"));
 
-app.get("/thankyou", (req, res) => {
-    db.getSignerCount().then(n => {
-        //should be all signatures with a limit on it
-        //console.log(n);
-        res.render("thankyou", {
-            layout: "main",
-            amount: n.rowCount
+function guardRoute(req, res, next) {
+    if (!req.body.userId) {
+        res.redirect("/");
+    } else {
+        next();
+    }
+}
+
+app.get("/thankyou", guardRoute, (req, res) => {
+    db.getSignerCount()
+        .then(data => {
+            //should be all signatures with a limit on it
+            console.log(data.rows[0].count);
+            res.render("thankyou", {
+                layout: "main",
+                amount: data.rows[0].count
+            });
+        })
+        .catch(err => {
+            console.log("ERROR", err);
+            res.render("thankyou", {
+                layout: "main",
+                error: err
+            });
         });
-    });
 });
 
 app.get("/login", (req, res) => {
@@ -58,6 +74,7 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
+    console.log(typeof req.body);
     req.body.password = bcrypt
         .hashPw(req.body.password)
         .then(pw => {
@@ -80,7 +97,19 @@ app.post("/login", (req, res) => {
         });
 });
 
-app.get("/signatures", (req, res) => {});
+app.get("/signatures", (req, res) => {
+    db.getAllSignatures()
+        .then(data => {
+            console.log(data);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    res.render("totalSign", {
+        layout: "main",
+        cause: title
+    });
+});
 
 app.get("/", (req, res) => {
     res.render("register", {
@@ -100,7 +129,7 @@ app.post("/", (req, res) => {
     req.body.password = bcrypt
         .hashPw(req.body.password)
         .then(pw => {
-            console.log("pw:" + pw);
+            //console.log("pw:" + pw);
         })
         .catch(err => {
             console.log("ERROR:" + err);
@@ -113,7 +142,7 @@ app.post("/", (req, res) => {
     )
         .then(values => {
             res.redirect("/profile");
-            console.log("values", values);
+            //console.log("values", values);
         })
         .catch(err => {
             console.log(err.detail);
@@ -125,7 +154,7 @@ app.post("/", (req, res) => {
         });
 });
 
-app.get("/edit", (req, res) => {
+app.get("/edit", guardRoute, (req, res) => {
     res.render("edit", {
         navItems: [{ name: "See your fellow supporters", link: "/signatures" }],
         layout: "main",
@@ -134,7 +163,7 @@ app.get("/edit", (req, res) => {
     });
 });
 
-app.get("/profile", (req, res) => {
+app.get("/profile", guardRoute, (req, res) => {
     //TODO:: redirect logged in users to /profile/edit
     res.render("profile", {
         layout: "main",
@@ -145,9 +174,11 @@ app.get("/profile", (req, res) => {
     });
 });
 
-app.post("/profile", (req, res) => {});
+app.post("/profile", guardRoute, (req, res) => {
+    console.log(req.body);
+});
 
-app.get("/sign", (req, res) => {
+app.get("/sign", guardRoute, (req, res) => {
     res.render("sign", {
         layout: "main",
         cause: title,
@@ -155,9 +186,18 @@ app.get("/sign", (req, res) => {
     });
 });
 
-app.post("/sign", (req, res) => {
-    console.log(req.body);
-    res.redirect("/thankyou");
+app.post("/sign", guardRoute, (req, res) => {
+    db.createSignature(req.body.signInput)
+        .then(data => {
+            res.redirect("/thankyou");
+        })
+        .catch(err => {
+            console.log("ERROR", err);
+            res.render("sign", {
+                layout: "main",
+                error: err
+            });
+        });
 });
 
 app.listen(8080, () => console.log("SERVER ONLINE"));
