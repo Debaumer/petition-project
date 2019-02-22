@@ -111,7 +111,7 @@ app.get("/signatures", (req, res) => {
     });
 });
 
-app.get("/register", (req, res) => {
+app.get("/", (req, res) => {
     res.render("register", {
         layout: "main",
         cause: {
@@ -124,7 +124,7 @@ app.get("/register", (req, res) => {
     });
 });
 
-app.post("/register", (req, res) => {
+app.post("/", (req, res) => {
     //console.log('hello');
     req.body.password = bcrypt
         .hashPw(req.body.password)
