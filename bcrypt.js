@@ -10,21 +10,14 @@ module.exports.hashPw = password => {
     });
 };
 
-module.exports.comparePw = (
-    textEnteredInLoginForm,
-    hashedPasswordFromDatabase
-) => {
+module.exports.checkHashData = (formValue, dbValue) => {
     return new Promise(function(resolve, reject) {
-        bcrypt.compare(
-            textEnteredInLoginForm,
-            hashedPasswordFromDatabase,
-            function(err, doesMatch) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(doesMatch);
-                }
+        bcrypt.compare(formValue, dbValue, function(err, doesMatch) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(doesMatch);
             }
-        );
+        });
     });
 };

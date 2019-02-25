@@ -13,7 +13,7 @@ app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
 var title =
-    "Make SPICED hoodies that are slightly lighter grey than the ones that are currently on offer, \n again";
+    "Make SPICED hoodies that are slightly lighter grey than the ones that are currently on offer,  again!";
 
 app.use(
     cookieSession({
@@ -39,76 +39,14 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + "/public"));
 
 function guardRoute(req, res, next) {
-    if (!req.body.userId) {
+    if (!req.session.id) {
+        console.log("req.session", req.session);
+        console.log("routeGuarded");
         res.redirect("/");
     } else {
         next();
     }
 }
-
-app.get("/thankyou", guardRoute, (req, res) => {
-    db.getSignerCount()
-        .then(data => {
-            //should be all signatures with a limit on it
-            console.log(data.rows[0].count);
-            res.render("thankyou", {
-                layout: "main",
-                amount: data.rows[0].count
-            });
-        })
-        .catch(err => {
-            console.log("ERROR", err);
-            res.render("thankyou", {
-                layout: "main",
-                error: err
-            });
-        });
-});
-
-app.get("/login", (req, res) => {
-    res.render("login", {
-        layout: "main",
-        csrfToken: req.csrfToken
-    });
-});
-
-app.post("/login", (req, res) => {
-    console.log(typeof req.body);
-    req.body.password = bcrypt
-        .hashPw(req.body.password)
-        .then(pw => {
-            console.log("pw:" + pw);
-        })
-        .catch(err => {
-            console.log("ERROR:" + err);
-        });
-    console.log(req.body.password);
-    db.login(req.body.email, req.body.password)
-        .then(data => {
-            console.log(data);
-        })
-        .catch(err => {
-            console.log("ERROR", err);
-            res.render("login", {
-                layout: "main",
-                error: err
-            });
-        });
-});
-
-app.get("/signatures", (req, res) => {
-    db.getAllSignatures()
-        .then(data => {
-            console.log(data);
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    res.render("totalSign", {
-        layout: "main",
-        cause: title
-    });
-});
 
 app.get("/", (req, res) => {
     res.render("register", {
@@ -122,57 +60,225 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-    //console.log('hello');
-    req.body.password = bcrypt
+    bcrypt
         .hashPw(req.body.password)
         .then(pw => {
-            //console.log("pw:" + pw);
+            db.createUser(
+                req.body.firstName,
+                req.body.lastName,
+                req.body.email,
+                pw
+            )
+                .then(values => {
+                    console.log("VALUES ROW", values);
+                    db.loginCheck(req.body.email)
+                        .then(data => {
+                            req.session.id = data.rows[0].id;
+                            console.log("user id", req.session.id);
+
+                            req.session.firstName = req.body.firstName;
+                            req.session.lastName = req.body.lastName;
+                            req.session.email = req.body.email;
+                            console.log("user id in session", req.session.id);
+                            res.redirect("/profile");
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+
+                    //console.log("values", values);
+                })
+                .catch(err => {
+                    console.log("errr", err);
+                    res.render("register", {
+                        layout: "main",
+                        error: err,
+                        msg: err
+                    });
+                });
         })
         .catch(err => {
             console.log("ERROR:" + err);
         });
-    db.createUser(
-        req.body.firstName,
-        req.body.lastName,
-        req.body.email,
-        req.body.password
-    )
-        .then(values => {
-            res.redirect("/profile");
-            //console.log("values", values);
-        })
-        .catch(err => {
-            console.log(err.detail);
-            res.render("register", {
-                layout: "main",
-                error: err,
-                msg: err
-            });
-        });
-});
-
-app.get("/edit", guardRoute, (req, res) => {
-    res.render("edit", {
-        navItems: [{ name: "See your fellow supporters", link: "/signatures" }],
-        layout: "main",
-        cause: "",
-        csrfToken: req.csrfToken
-    });
 });
 
 app.get("/profile", guardRoute, (req, res) => {
     //TODO:: redirect logged in users to /profile/edit
     res.render("profile", {
         layout: "main",
+        nav: [
+            {
+                name: "logout",
+                link: "/logout"
+            }
+        ],
         cause: {
-            title: title
+            cause: title
         },
         csrfToken: req.csrfToken
     });
 });
 
 app.post("/profile", guardRoute, (req, res) => {
-    console.log(req.body);
+    console.log("req.session.id", req.session.id);
+    db.createProfile(
+        req.session.id,
+        req.body.city,
+        req.body.homepage,
+        req.body.age
+    )
+        .then(results => {
+            res.redirect("/sign");
+        })
+        .catch(err => {
+            console.log("ERROR ", err);
+        });
+});
+
+app.get("/thankyou", guardRoute, (req, res) => {
+    var count = db
+        .getSignerCount()
+        .then(data => {
+            count = data.rowCount;
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    db.getSig(req.session.id)
+        .then(data => {
+            res.render("thankyou", {
+                layout: "main",
+                cause: title,
+                firstName: req.session.firstName,
+                amount: count,
+                supporter: [
+                    {
+                        signature: data.rows[0].signature
+                    }
+                ]
+            });
+        })
+        .catch(err => {
+            res.render("thankyou", {
+                layout: "main",
+                error: err
+            });
+        });
+});
+
+app.get("/login", (req, res) => {
+    db.loginCheck(req.session.email)
+        .then(data => {
+            console.log("DATA", data.rows[0].id);
+            if (req.session.id == data.rows[0].id) {
+                console.log("hit it");
+                res.redirect("/thankyou");
+            } else {
+                //do nothing
+            }
+            //bcrypt.checkHashData();
+        })
+        .catch(err => {
+            res.render("login", {
+                layout: "main",
+                cause: title,
+                error: err
+            });
+        });
+});
+
+app.post("/login", (req, res) => {
+    db.login(req.body.email)
+        .then(data => {
+            bcrypt
+                .checkHashData(req.body.password, data.rows[0].password)
+                .then(data => {
+                    if (data === true) {
+                        req.session.email = req.body.email;
+                        db.loginCheck(req.session.email)
+                            .then(data => {
+                                req.session.id = data.rows[0].id;
+                                res.redirect("/thankyou");
+                            })
+                            .catch(err => {
+                                console.log("error", err);
+                            });
+                    } else if (data === false) {
+                        res.render("login", {
+                            layout: "main",
+                            error: true,
+                            msg: "Your email or password were incorrect"
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.log("ERROR", err);
+                });
+        })
+        .catch(err => {
+            console.log("err", err);
+        });
+});
+
+app.get("/signatures", (req, res) => {
+    var allsigs = db
+        .getAllSigners()
+        .then(data => {
+            return data.rows.map(item => {
+                return {
+                    sig: item.signature
+                };
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    console.log(allsigs);
+    db.getProfile()
+        .then(data => {
+            //console.log(data.rows[0].city);
+            console.log(allsigs);
+            const alldata = data.rows.map(item => {
+                return {
+                    firstName: item.firstname,
+                    lastName: item.lastname,
+                    city: item.city,
+                    homepage: item.homepage,
+                    age: item.age
+                };
+            });
+            console.log(alldata);
+
+            res.render("totalSign", {
+                layout: "main",
+                cause: title,
+                supporter: alldata,
+                signatures: allsigs,
+                navItems: [
+                    { name: "Edit your details", link: "/edit" },
+                    { name: "See your signature", link: "/sign" },
+                    {
+                        name: "logout",
+                        link: "/logout"
+                    }
+                ]
+            });
+        })
+        .catch(err => {
+            console.log("ERROR", err);
+        });
+});
+
+app.get("/edit", guardRoute, (req, res) => {
+    res.render("edit", {
+        navItems: [
+            { name: "See your fellow supporters", link: "/signatures" },
+            { name: "logout", link: "logout" }
+        ],
+        layout: "main",
+        cause: "",
+        csrfToken: req.csrfToken
+    });
 });
 
 app.get("/sign", guardRoute, (req, res) => {
@@ -183,9 +289,20 @@ app.get("/sign", guardRoute, (req, res) => {
     });
 });
 
+app.get("/logout", function(req, res) {
+    req.session = null;
+    res.redirect("/");
+});
+
 app.post("/sign", guardRoute, (req, res) => {
-    db.createSignature(req.body.signInput)
+    db.createSignature(
+        req.session.id,
+        req.body.sigInput,
+        req.body.firstName,
+        req.body.lastName
+    )
         .then(data => {
+            console.log(data);
             res.redirect("/thankyou");
         })
         .catch(err => {
@@ -197,4 +314,15 @@ app.post("/sign", guardRoute, (req, res) => {
         });
 });
 
-app.listen(process.env.PORT || 8080);
+app.get("/register", (req, res) => {
+    res.redirect("/");
+});
+
+app.use(function(req, res, next) {
+    res.status(404);
+    res.send(
+        "<h1>404 PAGE NOT FOUND</h1><br>this is probably <em>your</em> fault"
+    );
+});
+
+app.listen(process.env.PORT || 8080, () => console.log("SERVER ONLINE"));
