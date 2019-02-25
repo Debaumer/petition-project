@@ -13,8 +13,8 @@ CREATE TABLE users (
 CREATE TABLE signatures(
     user_id INTEGER REFERENCES users(id) NOT NULL UNIQUE,
     signature VARCHAR(10000),
-    firstName VARCHAR(40), --get rid of this
-    lastName VARCHAR (40) --get rid of this
+    firstName VARCHAR(40),
+    lastName VARCHAR (40)
 );
 
 CREATE TABLE user_profiles (

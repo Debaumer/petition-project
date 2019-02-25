@@ -149,6 +149,12 @@ app.get("/thankyou", guardRoute, (req, res) => {
             res.render("thankyou", {
                 layout: "main",
                 cause: title,
+                nav: [
+                    {
+                        name: "edit your details",
+                        link: "/edit"
+                    }
+                ],
                 firstName: req.session.firstName,
                 amount: count,
                 supporter: [
@@ -181,8 +187,7 @@ app.get("/login", (req, res) => {
         .catch(err => {
             res.render("login", {
                 layout: "main",
-                cause: title,
-                error: err
+                cause: title
             });
         });
 });
@@ -279,6 +284,77 @@ app.get("/edit", guardRoute, (req, res) => {
         cause: "",
         csrfToken: req.csrfToken
     });
+});
+
+app.post("/edit", guardRoute, (req, res) => {
+    console.log(
+        "DATA",
+        req.body.age,
+        req.body.city,
+        req.body.url,
+        req.session.user_id
+    );
+    if (req.body.password != "") {
+        return bcrypt.hashPw(req.body.password).then(password =>
+            db
+                .updateProfile(
+                    req.session.user_id,
+                    req.body.firstname,
+                    req.body.lastname,
+                    req.body.email,
+                    password
+                )
+                .then(() =>
+                    db.insertProfile(
+                        req.body.age,
+                        req.body.city,
+                        req.body.url,
+                        req.session.user_id
+                    )
+                )
+                .then(() => db.editProfile(req.session.user_id))
+                .then(results =>
+                    res.render("edit", {
+                        layout: "main",
+                        profile: results.rows[0],
+                        change: "change"
+                    })
+                )
+                .catch(function(error) {
+                    console.log("error in POST /edit wPW:", error);
+                })
+        );
+        // UPDATE users table
+        // update first firstname, lastname, email, and password
+    } else {
+        // update first firstname, lastname, and email
+        return db
+            .updateProfile(
+                req.session.user_id,
+                req.body.firstname,
+                req.body.lastname,
+                req.body.email
+            )
+            .then(() =>
+                db.insertProfile(
+                    req.body.age,
+                    req.body.city,
+                    req.body.url,
+                    req.session.user_id
+                )
+            )
+            .then(() => db.editProfile(req.session.user_id))
+            .then(results =>
+                res.render("edit", {
+                    layout: "main",
+                    profile: results.rows[0],
+                    change: "change"
+                })
+            )
+            .catch(function(error) {
+                console.log("error in POST /edit w/oPW:", error);
+            });
+    }
 });
 
 app.get("/sign", guardRoute, (req, res) => {
