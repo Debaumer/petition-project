@@ -59,10 +59,12 @@ clearButton = document.getElementById("clearButton");
 console.log(submit);
 console.log(clearButton);
 // console.log(canvas);
+
 w = canvas.width;
 h = canvas.height;
 // console.log(w);
 // console.log(h);
+
 submit.addEventListener("submit", function(e) {
     //e.preventDefault();
     save();
