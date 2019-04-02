@@ -13,8 +13,7 @@ const hb = require("express-handlebars");
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
-var title =
-    "Make SPICED hoodies that are slightly lighter grey than the ones that are currently on offer, \n again";
+var title = "PlaceHolder Petition Title";
 
 app.use(
     cookieSession({
@@ -125,15 +124,16 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-    //console.log('hello');
+    console.log("password before hashing", req.body.password);
     req.body.password = bcrypt
         .hashPw(req.body.password)
         .then(pw => {
-            //console.log("pw:" + pw);
+            console.log("pw after hashing:" + pw);
         })
         .catch(err => {
             console.log("ERROR:" + err);
         });
+    console.log("taking place after bcrypt", req.body.password);
     db.createUser(
         req.body.firstName,
         req.body.lastName,
@@ -142,7 +142,7 @@ app.post("/", (req, res) => {
     )
         .then(values => {
             res.redirect("/profile");
-            //console.log("values", values);
+            console.log("values on db.createUser", values);
         })
         .catch(err => {
             console.log(err.detail);

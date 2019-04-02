@@ -9,64 +9,17 @@ var canvas,
     dot_flag = false;
 var submit = false;
 
-// function init() {
-//     canvas = document.getElementById('sigCanvas');
-//     ctx = canvas.getContext("2d");
-//     submit = document.getElementById("petitionForm");
-//     clearButton = document.getElementById("clearButton");
-//     console.log(document.querySelectorAll('button'));
-//     console.log(submit);
-//     console.log(clearButton);
-//     // console.log(canvas);
-//     w = canvas.width;
-//     h = canvas.height;
-//     // console.log(w);
-//     // console.log(h);
-//     submit.addEventListener('submit', function(e) {
-//       //e.preventDefault();
-//       save();
-//       console.log(e.target);
-//       console.log(e.target[3].value);
-//       console.log(e.target[2].value);
-//     });
-//
-//     clearButton.addEventListener('click', function(e) {
-//       erase();
-//     });
-//
-//
-//     canvas.addEventListener("mousemove", function (e) {
-//         findxy('move', e)
-//         //console.log(e);
-//     }, false);
-//     canvas.addEventListener("mousedown", function (e) {
-//         findxy('down', e)
-//         //console.log(e);
-//     }, false);
-//     canvas.addEventListener("mouseup", function (e) {
-//         findxy('up', e)
-//         //console.log(e);
-//     }, false);
-//     canvas.addEventListener("mouseout", function (e) {
-//         findxy('out', e)
-//         //console.log(e);
-//     }, false);
-// }
 canvas = document.getElementById("sigCanvas");
 ctx = canvas.getContext("2d");
 submit = document.getElementById("petitionForm");
 clearButton = document.getElementById("clearButton");
 console.log(submit);
 console.log(clearButton);
-// console.log(canvas);
 
 w = canvas.width;
 h = canvas.height;
-// console.log(w);
-// console.log(h);
 
 submit.addEventListener("submit", function(e) {
-    //e.preventDefault();
     save();
     console.log(e.target);
     console.log(e.target[3].value);

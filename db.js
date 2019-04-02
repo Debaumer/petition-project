@@ -1,5 +1,4 @@
 var spicedPg = require("spiced-pg");
-var secret = require("./secret.json");
 var db = spicedPg("postgres:postgres:postgres@localhost:5432/petition");
 
 exports.getAllSignatures = function() {
@@ -9,6 +8,7 @@ exports.getAllSignatures = function() {
 };
 
 exports.createUser = function(first, last, email, password) {
+    console.log("password in DB.js", password);
     const qs =
         "INSERT INTO users (firstName, lastName, email, password) VALUES($1,$2,$3,$4)";
     return db.query(qs, [first, last, email, password]);
