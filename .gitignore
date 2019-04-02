@@ -8,3 +8,5 @@ views/partials/cause*
 views/partials/modal*
 /views/maker
 /public/canvas.js
+
+npm-debug.log
