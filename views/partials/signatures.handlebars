@@ -4,6 +4,8 @@
     <h6>{{age}}</h6>
     <h6>{{city}}</h6>
     <h6>{{homepage}}</h6>
-    <img src="{{signature}}">
+    {{#if signature}}
+        <img class="signature" src="{{signature}}">
+    {{/if}}
   {{/supporter}}
 </div>

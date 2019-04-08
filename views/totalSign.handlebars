@@ -2,12 +2,15 @@
 <h2>Meet your fellow supporters</h2>
 <div id="supporters">
   {{#supporter}}
-    <h3>{{firstName}} {{lastName}}</h3>
-    <h5>{{age}}</h5>
-    <h5>{{city}}</h5>
-    <h5>{{homepage}}</h5>
-    {{#signatures}}
-        <h1>{{sig}}</h1>
-    {{/signatures}}
+  <div class="supporter">
+        <h3>{{firstName}} {{lastName}}</h3>
+        <h5>{{age}}</h5>
+        <h5>{{city}}</h5>
+        <h5>{{homepage}}</h5>
+        {{#if signature}}
+            <h5><em>Signed:</em></h5>
+            <img class="signature" src="{{signature}}">
+        {{/if}}
+    </div>
   {{/supporter}}
 </div>

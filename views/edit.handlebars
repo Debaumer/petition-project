@@ -1,26 +1,47 @@
 <h2>Change your details</h2>
 <form method="POST">
-  <input type="text" name="firstName" placeholder="first name">
-  <label for="firstName">First Name</label>
 
-  <input type="text" name="lastName" placeholder="last name">
-  <label for="lastName">Last Name</label>
+    {{#if firstname}}
+    <input type="text" name="firstName" placeholder={{firstname}}>
+    {{else}}
+    <input type="text" name="firstName" placeholder="firstname">
+    {{/if}}
 
-  <input type="email" name="email" placeholder="e-mail">
-  <label for="email">E-mail</label>
+    {{#if lastname}}
+    <input type="text" name="lastName" placeholder={{lastname}}>
+    {{else}}
+    <input type="text" name="lastName" placeholder="last name">
+    {{/if}}
 
-  <input type="password" name="password" placeholder="password">
-  <label for="password">Password</label>
+    {{#if email}}
+    <input type="email" name="email"  placeholder={{email}}>
+    {{else}}
+        <input type="email" name="email"  placeholder="e-mail">
+    {{/if}}
 
-  <input type="text" name="age" placeholder="age">
-  <label for="age">Age</label>
+  <input type="password" name="password" placeholder="·········">
 
-  <input type="text" name="city" placeholder="city/town">
-  <label for="city">City or Town</label>
+  {{#if age}}
+    <input type="text" name="age" placeholder={{age}}>
+  {{else}}
+    <input type="text" name="age" placeholder="age">
+  {{/if}}
 
-  <input type="text" name="homepage" placeholder="homepage or social media">
-  <label for="homepage">Homepage</label>
+  {{#if city}}
+  <input type="text" name="city" placeholder={{city}}>
+  {{else}}
+    <input type="text" name="city" placeholder="city/town">
+  {{/if}}
+
+
+  {{#if homepage}}
+    <input type="text" name="homepage" placeholder={{homepage}}>
+  {{else}}
+    <input type="text" name="homepage" placeholder="homepage or social media">
+  {{/if}}
+
 
   <input type="hidden" name="_csrf" value="{{csrfToken}}">
   <input  id="formButton" type="submit" name="submit" value="Update">
+
 </form>

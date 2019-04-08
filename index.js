@@ -38,24 +38,30 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + "/public"));
 
 function guardRoute(req, res, next) {
+    console.log("GUARDROUTE RUNNING");
     if (!req.session.id) {
         console.log("req.session", req.session);
         console.log("routeGuarded");
         res.redirect("/");
     } else {
+        console.log("GUARDROUTE STANDING DOWN");
         next();
     }
 }
 
 app.get("/", (req, res) => {
-    res.render("register", {
-        layout: "main",
-        cause: title,
-        csrfToken: req.csrfToken,
-        navItems: [
-            { name: "see who else has signed already", link: "/signatures" }
-        ]
-    });
+    if (req.session.id) {
+        res.redirect("/signatures");
+    } else {
+        res.render("register", {
+            layout: "main",
+            cause: title,
+            csrfToken: req.csrfToken,
+            navItems: [
+                { name: "see who else has signed already", link: "/signatures" }
+            ]
+        });
+    }
 });
 
 app.post("/", (req, res) => {
@@ -134,47 +140,101 @@ app.post("/profile", guardRoute, (req, res) => {
         });
 });
 
-app.get("/thankyou", guardRoute, (req, res) => {
-    var count = db
-        .getSignerCount()
+app.get("/profile/edit", guardRoute, (req, res) => {
+    db.getProfile(req.session.id)
         .then(data => {
-            count = data.rowCount;
+            var showData = data.rows[0];
+            res.render("edit", {
+                navItems: [
+                    { name: "See your fellow supporters", link: "/signatures" },
+                    { name: "logout", link: "/logout" }
+                ],
+                layout: "main",
+                cause: title,
+                email: showData.email,
+                firstname: showData.firstname,
+                lastname: showData.lastname,
+                age: showData.age,
+                city: showData.city,
+                homepage: showData.homepage,
+                signature: showData.signature,
+                csrfToken: req.csrfToken
+            });
         })
         .catch(err => {
             console.log(err);
         });
-    db.getSig(req.session.id)
+});
+
+app.post("/profile/edit", guardRoute, (req, res) => {
+    db.updateUserInfo(
+        req.session.id,
+        req.body.firstName,
+        req.body.lastName,
+        req.body.email,
+        req.body.password
+    )
         .then(data => {
-            res.render("thankyou", {
-                layout: "main",
-                cause: title,
-                nav: [
-                    {
-                        name: "edit your details",
-                        link: "/edit"
-                    }
-                ],
-                firstName: req.session.firstName,
-                amount: count,
-                supporter: [
-                    {
-                        signature: data.rows[0].signature
-                    }
-                ]
-            });
+            console.log("updateuserInfo", data);
+            db.updateProfile(
+                req.body.age,
+                req.body.city,
+                req.body.homepage,
+                req.session.id
+            )
+                .then(data => {
+                    console.log("updateProfile", data);
+                    res.redirect("/profile/edit");
+                })
+                .catch(err => {
+                    console.log("updateprofile error:", err);
+                });
         })
         .catch(err => {
-            res.render("thankyou", {
-                layout: "main",
-                error: err
-            });
+            console.log("updateuserinfo error:", err);
+        });
+});
+
+app.get("/thankyou", guardRoute, (req, res) => {
+    var count = db
+        .getSignerCount()
+        .then(data => {
+            var count = data.rows[0].count;
+            db.getSig(req.session.id)
+                .then(data => {
+                    res.render("thankyou", {
+                        layout: "main",
+                        cause: title,
+                        nav: [
+                            {
+                                name: "Edit Your Details",
+                                link: "/profile/edit"
+                            }
+                        ],
+                        firstName: req.session.firstName,
+                        amount: count,
+                        supporter: [
+                            {
+                                signature: data.rows[0].signature
+                            }
+                        ]
+                    });
+                })
+                .catch(err => {
+                    res.render("thankyou", {
+                        layout: "main",
+                        error: err
+                    });
+                });
+        })
+        .catch(err => {
+            console.log(err);
         });
 });
 
 app.get("/login", (req, res) => {
     db.loginCheck(req.session.email)
         .then(data => {
-            console.log("DATA", data.rows[0].id);
             if (req.session.id == data.rows[0].id) {
                 console.log("hit it");
                 res.redirect("/thankyou");
@@ -225,6 +285,12 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/signatures", (req, res) => {
+    var navbarItems = {};
+    if (req.session.id) {
+        console.log("user is logged in");
+        navbarItems = [];
+        //console.log(navbarItems);
+    }
     var allsigs = db
         .getAllSigners()
         .then(data => {
@@ -237,21 +303,20 @@ app.get("/signatures", (req, res) => {
         .catch(err => {
             console.log(err);
         });
-    console.log(allsigs);
-    db.getProfile()
+
+    db.getAllProfiles()
         .then(data => {
             //console.log(data.rows[0].city);
-            console.log(allsigs);
             const alldata = data.rows.map(item => {
                 return {
                     firstName: item.firstname,
                     lastName: item.lastname,
                     city: item.city,
                     homepage: item.homepage,
-                    age: item.age
+                    age: item.age,
+                    signature: item.signature
                 };
             });
-            console.log(alldata);
 
             res.render("totalSign", {
                 layout: "main",
@@ -259,8 +324,8 @@ app.get("/signatures", (req, res) => {
                 supporter: alldata,
                 signatures: allsigs,
                 navItems: [
-                    { name: "Edit your details", link: "/edit" },
-                    { name: "See your signature", link: "/sign" },
+                    { name: "Edit your details", link: "/profile/edit" },
+                    { name: "See your signature", link: "/thankyou" },
                     {
                         name: "logout",
                         link: "/logout"
@@ -271,89 +336,6 @@ app.get("/signatures", (req, res) => {
         .catch(err => {
             console.log("ERROR", err);
         });
-});
-
-app.get("/edit", guardRoute, (req, res) => {
-    res.render("edit", {
-        navItems: [
-            { name: "See your fellow supporters", link: "/signatures" },
-            { name: "logout", link: "logout" }
-        ],
-        layout: "main",
-        cause: "",
-        csrfToken: req.csrfToken
-    });
-});
-
-app.post("/edit", guardRoute, (req, res) => {
-    console.log(
-        "DATA",
-        req.body.age,
-        req.body.city,
-        req.body.url,
-        req.session.user_id
-    );
-    if (req.body.password != "") {
-        return bcrypt.hashPw(req.body.password).then(password =>
-            db
-                .updateProfile(
-                    req.session.user_id,
-                    req.body.firstname,
-                    req.body.lastname,
-                    req.body.email,
-                    password
-                )
-                .then(() =>
-                    db.insertProfile(
-                        req.body.age,
-                        req.body.city,
-                        req.body.url,
-                        req.session.user_id
-                    )
-                )
-                .then(() => db.editProfile(req.session.user_id))
-                .then(results =>
-                    res.render("edit", {
-                        layout: "main",
-                        profile: results.rows[0],
-                        change: "change"
-                    })
-                )
-                .catch(function(error) {
-                    console.log("error in POST /edit wPW:", error);
-                })
-        );
-        // UPDATE users table
-        // update first firstname, lastname, email, and password
-    } else {
-        // update first firstname, lastname, and email
-        return db
-            .updateProfile(
-                req.session.user_id,
-                req.body.firstname,
-                req.body.lastname,
-                req.body.email
-            )
-            .then(() =>
-                db.insertProfile(
-                    req.body.age,
-                    req.body.city,
-                    req.body.url,
-                    req.session.user_id
-                )
-            )
-            .then(() => db.editProfile(req.session.user_id))
-            .then(results =>
-                res.render("edit", {
-                    layout: "main",
-                    profile: results.rows[0],
-                    change: "change"
-                })
-            )
-            .catch(function(error) {
-                console.log("error in POST /edit w/oPW:", error);
-            });
-    }
 });
 
 app.get("/sign", guardRoute, (req, res) => {
