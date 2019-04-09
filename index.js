@@ -12,7 +12,13 @@ const hb = require("express-handlebars");
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
-var title = "PlaceHolder Title";
+var title = [
+    "Diets",
+    "Public Enemies",
+    "International Boogeymen",
+    "Brands promoting Social Issues",
+    "Welfare Recipients"
+];
 
 app.use(
     cookieSession({
@@ -195,6 +201,39 @@ app.post("/profile/edit", guardRoute, (req, res) => {
         });
 });
 
+app.get("/profile/signature", guardRoute, (req, res) => {
+    db.getSig(req.session.id)
+        .then(data => {
+            res.render("sign", {
+                layout: "main",
+                cause: title,
+                csrfToken: req.csrfToken
+            });
+        })
+        .catch(err => {
+            res.render("thankyou", {
+                layout: "main",
+                error: err
+            });
+        });
+});
+
+app.post("/profile/signature", guardRoute, (req, res) => {
+    db.updateSignature(
+        req.session.id,
+        req.body.sigInput,
+        req.body.firstName,
+        req.body.lastName
+    )
+        .then(data => {
+            console.log(data);
+            res.redirect("/thankyou");
+        })
+        .catch(err => {
+            console.log(err);
+        });
+});
+
 app.get("/thankyou", guardRoute, (req, res) => {
     var count = db
         .getSignerCount()
@@ -292,8 +331,9 @@ app.get("/signatures", (req, res) => {
         //console.log(navbarItems);
     }
     var allsigs = db
-        .getAllSigners()
+        .getAllSigners(req.session.id)
         .then(data => {
+            console.log(data.rows);
             return data.rows.map(item => {
                 return {
                     sig: item.signature
@@ -304,7 +344,7 @@ app.get("/signatures", (req, res) => {
             console.log(err);
         });
 
-    db.getAllProfiles()
+    db.getAllProfiles(req.session.id)
         .then(data => {
             //console.log(data.rows[0].city);
             const alldata = data.rows.map(item => {

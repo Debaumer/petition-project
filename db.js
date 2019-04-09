@@ -33,8 +33,9 @@ exports.getSignerCount = function() {
     return db.query(qs);
 };
 
-exports.getAllSigners = function getAllSigners() {
-    return db.query("SELECT * FROM signatures");
+exports.getAllSigners = function getAllSigners(user_id) {
+    console.log(user_id);
+    return db.query("SELECT * FROM signatures WHERE user_id != $1", [user_id]);
 };
 
 exports.deleteSignature = function deleteSignature(id) {
@@ -60,7 +61,7 @@ exports.createProfile = function(user_id, city, homepage, age) {
     return db.query(qs, [user_id, city, homepage, age]);
 };
 
-module.exports.getAllProfiles = function() {
+module.exports.getAllProfiles = function(user_id) {
     return db.query(
         `SELECT
         users.firstname AS firstName,
@@ -73,7 +74,9 @@ module.exports.getAllProfiles = function() {
         LEFT JOIN user_profiles
         ON users.id = user_profiles.user_id
         LEFT JOIN signatures
-        ON users.id = signatures.user_id`
+        ON users.id = signatures.user_id
+        WHERE users.id != $1`,
+        [user_id]
     );
 };
 
@@ -140,6 +143,17 @@ module.exports.updateProfile = function updateProfile(
         DO UPDATE SET age = $1, city = $2, homepage = $3, user_id = $4`;
     let params = [age, city, homepage, user_id];
     return db.query(qs, params);
+};
+
+module.exports.updateSignature = function updateSignature(
+    user_id,
+    signature,
+    firstName,
+    lastName
+) {
+    const qs =
+        "UPDATE signatures SET signature = $2 ,firstName = $3,lastName = $4 WHERE user_id = $1";
+    return db.query(qs, [user_id, signature, firstName, lastName]);
 };
 
 // function createUser(first, last, email, password, confPassword) {
