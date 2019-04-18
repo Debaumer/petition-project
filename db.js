@@ -34,7 +34,10 @@ exports.getSignerCount = function() {
 };
 
 exports.getAllSigners = function getAllSigners(user_id) {
-    console.log(user_id);
+    if (!user_id) {
+        return db.query("SELECT * FROM signatures");
+    }
+    console.log("user ID", user_id);
     return db.query("SELECT * FROM signatures WHERE user_id != $1", [user_id]);
 };
 
@@ -62,6 +65,22 @@ exports.createProfile = function(user_id, city, homepage, age) {
 };
 
 module.exports.getAllProfiles = function(user_id) {
+    if (!user_id) {
+        return db.query(
+            `SELECT
+            users.firstname AS firstName,
+            users.lastname AS lastName,
+            user_profiles.age AS age,
+            user_profiles.city AS city,
+            user_profiles.homepage AS homepage,
+            signatures.signature AS signature
+            FROM users
+            LEFT JOIN user_profiles
+            ON users.id = user_profiles.user_id
+            LEFT JOIN signatures
+            ON users.id = signatures.user_id`
+        );
+    }
     return db.query(
         `SELECT
         users.firstname AS firstName,

@@ -1,14 +1,15 @@
-//vars
 var canvas = document.getElementById("sigCanvas");
 var clearButton = document.getElementById("clearButton");
 var submit = document.getElementById("signatureForm");
 var ctx = canvas.getContext("2d");
 var canvSize = canvas.getBoundingClientRect();
+
 var prevX = 0;
 var prevY = 0;
 var currX = 0;
 var currY = 0;
 var flag = false;
+
 function init() {
     prevX = 0;
     prevY = 0;
@@ -103,7 +104,5 @@ canvas.addEventListener("mouseout", function(e) {
 });
 
 window.onresize = function() {
-    //add init code here
-    //need to re-init prevpos and currpos
     init();
 };

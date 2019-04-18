@@ -1,18 +1,18 @@
 <div id="register">
   <form method="POST" id="registerForm">
       <div>
-          <h1>Are you being told lies of convinience, do any of these
-              sound familiar?</h1>
-          <h1 id="title">{{cause}}</h1>
+          <h1>Demand more from companies trying to make a buck off of
+          lousy products, sign this petition against <a id="title"><em><strong>{{cause}}</strong></em></a></h1>
           <h1>Create an account to Sign the petition!</h2>
-          <input type="text" name="firstName" placeholder="first name"  >
-          <input type="text" name="lastName" placeholder="last name"  >
-          <input type="email" name="email" placeholder="E-mail"  >
-          <input type="password" name="password" placeholder="password"  >
-          <input id="sigInput" type="hidden" name="sigInput">
+          <input required type="text" name="firstName" placeholder="first name"  >
+          <input required type="text" name="lastName" placeholder="last name"  >
+          <input required type="email" name="email" placeholder="E-mail"  >
+          <input required type="password" name="password" placeholder="password"  >
+          <input required id="sigInput" type="hidden" name="sigInput">
           <input type="hidden" name="_csrf" value="{{csrfToken}}">
       </div>
       <input id="submitForm" value="Sign Up and Sign!" type="submit">
   </form>
   <h2>Already got an account? <a href="/login">Click here</a></h2>
 </div>
+<script src="/roulette.js"></script>

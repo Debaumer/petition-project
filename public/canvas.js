@@ -1,126 +1,36 @@
-var canvas,
-    ctx,
-    flag,
-    clearButton = false,
-    prevX = 0,
-    currX = 0,
-    prevY = 0,
-    currY = 0,
-    dot_flag = false;
-var submit = false;
+const canvasUrlInput = document.querySelector("#sigInput");
+let rect;
+const canvas = document.querySelector("#sigCanvas");
+if (canvas) {
+    var ctx = canvas.getContext("2d");
+    canvas.addEventListener("mousedown", e => {
+        rect = canvas.getBoundingClientRect();
+        let x = e.clientX - rect.left;
+        let y = e.clientY - rect.top;
+        initialize(x, y);
+        canvas.addEventListener("mousemove", handleMove);
+    });
 
-canvas = document.getElementById("sigCanvas");
-ctx = canvas.getContext("2d");
-submit = document.getElementById("petitionForm");
-clearButton = document.getElementById("clearButton");
-console.log(submit);
-console.log(clearButton);
+    canvas.addEventListener("mouseup", () => {
+        canvas.removeEventListener("mousemove", handleMove);
+        canvasUrlInput.value = canvas.toDataURL();
+    });
+}
 
-w = canvas.width;
-h = canvas.height;
+function handleMove(e) {
+    console.log("moving", e);
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+    draw(x, y);
+}
 
-submit.addEventListener("submit", function(e) {
-    save();
-    console.log(e.target);
-    console.log(e.target[3].value);
-    console.log(e.target[2].value);
-});
-
-clearButton.addEventListener("click", function(e) {
-    erase();
-});
-
-canvas.addEventListener(
-    "mousemove",
-    function(e) {
-        findxy("move", e);
-    },
-    false
-);
-canvas.addEventListener(
-    "mousedown",
-    function(e) {
-        findxy("down", e);
-    },
-    false
-);
-canvas.addEventListener(
-    "mouseup",
-    function(e) {
-        findxy("up", e);
-    },
-    false
-);
-canvas.addEventListener(
-    "mouseout",
-    function(e) {
-        findxy("out", e);
-    },
-    false
-);
-
-function draw() {
-    console.log("draw run");
+function initialize(x, y) {
+    ctx.strokeStyle = "black";
     ctx.beginPath();
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.moveTo(prevX, prevY);
-    ctx.lineTo(currX, currY);
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
+    ctx.moveTo(x, y);
+}
+
+function draw(x, y) {
+    ctx.lineTo(x, y);
     ctx.stroke();
 }
-
-function test() {
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(50, 50);
-    ctx.stroke();
-    ctx.closePath();
-}
-
-function erase() {
-    ctx.clearRect(0, 0, w, h);
-}
-
-function save() {
-    var dataURL = canvas.toDataURL();
-    document.getElementById("sigInput").value = dataURL;
-}
-
-function findxy(res, e) {
-    console.log(res);
-    if (res == "down") {
-        prevX = currX;
-        prevY = currY;
-        currX = e.clientX - canvas.offsetLeft;
-        currY = e.clientY - canvas.offsetTop;
-
-        flag = true;
-        dot_flag = true;
-        if (dot_flag) {
-            ctx.beginPath();
-            ctx.fillStyle = "black";
-            ctx.fillRect(currX, currY, 2, 2);
-            ctx.closePath();
-            dot_flag = false;
-        }
-    }
-    if (res == "up" || res == "out") {
-        flag = false;
-    }
-    if (res == "move") {
-        if (flag) {
-            prevX = currX;
-            prevY = currY;
-            currX = e.clientX - canvas.offsetLeft;
-            currY = e.clientY - canvas.offsetTop;
-            draw();
-        }
-    }
-}
-test();
-draw();

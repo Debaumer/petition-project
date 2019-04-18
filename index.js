@@ -12,13 +12,8 @@ const hb = require("express-handlebars");
 app.engine("handlebars", hb());
 app.set("view engine", "handlebars");
 
-var title = [
-    "Diets",
-    "Public Enemies",
-    "International Boogeymen",
-    "Brands promoting Social Issues",
-    "Welfare Recipients"
-];
+var title = ["Planned Obsolescence"];
+var navItems = [];
 
 app.use(
     cookieSession({
@@ -53,6 +48,12 @@ function guardRoute(req, res, next) {
         console.log("GUARDROUTE STANDING DOWN");
         next();
     }
+}
+
+function changeNav(req, res, next) {
+    console.log("navchange");
+
+    next();
 }
 
 app.get("/", (req, res) => {
@@ -193,10 +194,13 @@ app.post("/profile/edit", guardRoute, (req, res) => {
                     res.redirect("/profile/edit");
                 })
                 .catch(err => {
+                    res.redirect("/profile/edit");
                     console.log("updateprofile error:", err);
                 });
         })
         .catch(err => {
+            res.redirect("/profile/edit");
+
             console.log("updateuserinfo error:", err);
         });
 });
@@ -324,16 +328,23 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/signatures", (req, res) => {
-    var navbarItems = {};
+    var navbarItems = [{ name: "Join these people!", link: "/" }];
     if (req.session.id) {
         console.log("user is logged in");
-        navbarItems = [];
+        navbarItems = [
+            { name: "Edit your details", link: "/profile/edit" },
+            { name: "See your signature", link: "/thankyou" },
+            {
+                name: "logout",
+                link: "/logout"
+            }
+        ];
         //console.log(navbarItems);
     }
     var allsigs = db
         .getAllSigners(req.session.id)
         .then(data => {
-            console.log(data.rows);
+            console.log("data rows", data.rows);
             return data.rows.map(item => {
                 return {
                     sig: item.signature
@@ -363,14 +374,8 @@ app.get("/signatures", (req, res) => {
                 cause: title,
                 supporter: alldata,
                 signatures: allsigs,
-                navItems: [
-                    { name: "Edit your details", link: "/profile/edit" },
-                    { name: "See your signature", link: "/thankyou" },
-                    {
-                        name: "logout",
-                        link: "/logout"
-                    }
-                ]
+                navItems: navbarItems,
+                input: input
             });
         })
         .catch(err => {
