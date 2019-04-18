@@ -374,8 +374,7 @@ app.get("/signatures", (req, res) => {
                 cause: title,
                 supporter: alldata,
                 signatures: allsigs,
-                navItems: navbarItems,
-                input: input
+                navItems: navbarItems
             });
         })
         .catch(err => {
