@@ -1,4 +1,5 @@
-<h1 id="title">We want our money working for us not for profit: against {{cause}}</h1>
+<h1 id="title">We want our money working for us not for profit: against</h1>
+<p id="cause"><a id="unskew">{{cause}}</a></p>
 <h2>Meet your fellow supporters</h2>
 <div style="display: inline">
     <input id="searchBar" type="text" placeholder="search supporters"></input>
@@ -13,9 +14,13 @@
 <div id="supporters">
       {{#supporter}}
       <div class="supporter">
-            <h3>{{firstName}} {{lastName}}</h3>
-            <h5>{{age}}</h5>
-            <h5>{{city}}</h5>
+          <div>
+            <h3>{{firstName}} {{lastName}}
+                <br>
+            Age: {{age}},
+                <br>
+            Lives in: {{city}}</h3>
+        </div>
             <h5>{{homepage}}</h5>
             {{#if signature}}
                 <h5><em>Signed:</em></h5>

@@ -39,20 +39,14 @@ app.use(function(req, res, next) {
 app.use(express.static(__dirname + "/public"));
 
 function guardRoute(req, res, next) {
-    console.log("GUARDROUTE RUNNING");
     if (!req.session.id) {
-        console.log("req.session", req.session);
-        console.log("routeGuarded");
         res.redirect("/");
     } else {
-        console.log("GUARDROUTE STANDING DOWN");
         next();
     }
 }
 
 function changeNav(req, res, next) {
-    console.log("navchange");
-
     next();
 }
 
@@ -82,23 +76,18 @@ app.post("/", (req, res) => {
                 pw
             )
                 .then(values => {
-                    console.log("VALUES ROW", values);
                     db.loginCheck(req.body.email)
                         .then(data => {
                             req.session.id = data.rows[0].id;
-                            console.log("user id", req.session.id);
 
                             req.session.firstName = req.body.firstName;
                             req.session.lastName = req.body.lastName;
                             req.session.email = req.body.email;
-                            console.log("user id in session", req.session.id);
                             res.redirect("/profile");
                         })
                         .catch(err => {
                             console.log(err);
                         });
-
-                    //console.log("values", values);
                 })
                 .catch(err => {
                     console.log("errr", err);
@@ -116,6 +105,7 @@ app.post("/", (req, res) => {
 
 app.get("/profile", guardRoute, (req, res) => {
     //TODO:: redirect logged in users to /profile/edit
+    console.log("get profile title", title);
     res.render("profile", {
         layout: "main",
         nav: [
@@ -124,15 +114,12 @@ app.get("/profile", guardRoute, (req, res) => {
                 link: "/logout"
             }
         ],
-        cause: {
-            cause: title
-        },
+        cause: title[0],
         csrfToken: req.csrfToken
     });
 });
 
 app.post("/profile", guardRoute, (req, res) => {
-    console.log("req.session.id", req.session.id);
     db.createProfile(
         req.session.id,
         req.body.city,
@@ -157,7 +144,7 @@ app.get("/profile/edit", guardRoute, (req, res) => {
                     { name: "logout", link: "/logout" }
                 ],
                 layout: "main",
-                cause: title,
+                cause: "Planned Obsolescence",
                 email: showData.email,
                 firstname: showData.firstname,
                 lastname: showData.lastname,
@@ -182,7 +169,6 @@ app.post("/profile/edit", guardRoute, (req, res) => {
         req.body.password
     )
         .then(data => {
-            console.log("updateuserInfo", data);
             db.updateProfile(
                 req.body.age,
                 req.body.city,
@@ -190,7 +176,6 @@ app.post("/profile/edit", guardRoute, (req, res) => {
                 req.session.id
             )
                 .then(data => {
-                    console.log("updateProfile", data);
                     res.redirect("/profile/edit");
                 })
                 .catch(err => {
@@ -230,7 +215,6 @@ app.post("/profile/signature", guardRoute, (req, res) => {
         req.body.lastName
     )
         .then(data => {
-            console.log(data);
             res.redirect("/thankyou");
         })
         .catch(err => {
@@ -279,7 +263,6 @@ app.get("/login", (req, res) => {
     db.loginCheck(req.session.email)
         .then(data => {
             if (req.session.id == data.rows[0].id) {
-                console.log("hit it");
                 res.redirect("/thankyou");
             } else {
                 //do nothing
@@ -330,7 +313,6 @@ app.post("/login", (req, res) => {
 app.get("/signatures", (req, res) => {
     var navbarItems = [{ name: "Join these people!", link: "/" }];
     if (req.session.id) {
-        console.log("user is logged in");
         navbarItems = [
             { name: "Edit your details", link: "/profile/edit" },
             { name: "See your signature", link: "/thankyou" },
@@ -339,12 +321,10 @@ app.get("/signatures", (req, res) => {
                 link: "/logout"
             }
         ];
-        //console.log(navbarItems);
     }
     var allsigs = db
         .getAllSigners(req.session.id)
         .then(data => {
-            console.log("data rows", data.rows);
             return data.rows.map(item => {
                 return {
                     sig: item.signature
@@ -357,7 +337,6 @@ app.get("/signatures", (req, res) => {
 
     db.getAllProfiles(req.session.id)
         .then(data => {
-            //console.log(data.rows[0].city);
             const alldata = data.rows.map(item => {
                 return {
                     firstName: item.firstname,
@@ -403,7 +382,6 @@ app.post("/sign", guardRoute, (req, res) => {
         req.body.lastName
     )
         .then(data => {
-            console.log(data);
             res.redirect("/thankyou");
         })
         .catch(err => {
